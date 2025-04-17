@@ -100,7 +100,7 @@ test = [
     "pytest-cov<7.0.0,>=6.0.0",
 ]
 yolo = [
-    "ultralytics @ git+https://github.com/mikel-brostrom/ultralytics.git",
+    "ultralytics @ git+https://github.com/Peng-Lab-Particle-Tracking/ultralytics_boxmot.git",
 ]
 export = [
     "onnx<2.0.0,>=1.17.0",

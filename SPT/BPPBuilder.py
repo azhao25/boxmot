@@ -66,7 +66,7 @@ class YOLOBPPBuilder:
         output_path = Path(output_path)
         output_path.parent.mkdir(parents=True, exist_ok=True)
         with open(output_path, "w") as f:
-            f.write("frameno, id, x, y, w, h, score, class\n")
+            f.write("frameno,id,x,y,w,h,score\n")
         for frame_no, frame in enumerate(self.video):
             img = process_for_yolo(frame)
             results = self.model(
@@ -86,4 +86,4 @@ class YOLOBPPBuilder:
                 w = x2 - x
                 h = y2 - y
                 with open(output_path, "a") as f:
-                    f.write(f"{frame_no}, {track_id}, {x}, {y}, {w}, {h}, {conf}, {cls}\n")
+                    f.write(f"{round(frame_no)}, {int(track_id)}, {round(x)}, {round(y)}, {round(w)}, {round(h)}, {round(conf, 2)}\n")

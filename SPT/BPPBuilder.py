@@ -6,11 +6,11 @@ from pathlib import Path
 from typing import Union
 
 class YOLOBPPBuilder:
-    def __init__(self, model_path: Union[str, Path], reid_weights: Union[str, Path], confidence: float = 0.2, 
-                 iou: float = 0.1,
-                 max_det: int = 600,
-                 device: str = "cpu",
-                 half: bool = False):
+    def __init__(self, model_path: Union[str, Path], reid_weights: Union[str, Path], 
+                confidence: float = 0.1, iou: float = 0.5,
+                max_det: int = 600,
+                device: str = "cpu",
+                half: bool = False):
         """
         Initialize the YOLO + BoostTrack++ tracker
         Args:
@@ -30,11 +30,18 @@ class YOLOBPPBuilder:
         self.confidence = confidence
         self.iou = iou
         self.max_det = max_det
+        self.bpp = BoostTrackPP(
+            reid_weights=self.reid_weights,
+            device=self.device,
+            half=self.half
+        )
 
     def load(self, path: Union[str, Path]):
         """
         Load a tif video to track
         """
+        if isinstance(path, Path):
+            path = str(path)
         if not path.endswith(".tif") and not path.endswith(".tiff"):
             raise ValueError("File is not a tiff file")
         ret, mats = cv2.imreadmulti(
@@ -57,11 +64,7 @@ class YOLOBPPBuilder:
         Args:
             output_path: str, path to save the csv file
         """
-        bpp = BoostTrackPP(
-            reid_weights=self.reid_weights,
-            device=self.device,
-            half=self.half
-        )
+        
         # create path to output if doesn't exist
         output_path = Path(output_path)
         output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -80,7 +83,7 @@ class YOLOBPPBuilder:
             boxes = process_bounding_box(results[0], frame.shape[1], frame.shape[0])
             # Convert processed image to numpy array for tracking
             img_np = img.squeeze(0).permute(1, 2, 0).cpu().numpy()
-            tracks = bpp.update(boxes, img_np)
+            tracks = self.bpp.update(boxes, img_np)
             for track in tracks:
                 x, y, x2, y2, track_id, conf, cls, det_ind = track
                 w = x2 - x

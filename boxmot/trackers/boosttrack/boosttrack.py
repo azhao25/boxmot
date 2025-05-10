@@ -1,6 +1,7 @@
 import numpy as np
 from typing import Optional, List
 from collections import deque
+import cv2
 
 from boxmot.trackers.boosttrack.assoc import (
     associate,
@@ -197,9 +198,14 @@ class BoostTrack(BaseTracker):
         self.frame_count += 1
 
         if self.ecc is not None:
-            transform = self.ecc(img, self.frame_count)
-            for trk in self.trackers:
-                trk.camera_update(transform)
+            try:
+                transform = self.ecc(img, self.frame_count)
+                for trk in self.trackers:
+                    trk.camera_update(transform)
+            except cv2.error as e:
+                # If ECC fails, continue without camera motion compensation
+                print(f"ECC failed: {e}. Continuing without camera motion compensation.")
+                pass
 
         trks = []
         confs = []

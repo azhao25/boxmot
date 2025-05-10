@@ -1,3 +1,3 @@
-from .BPPBuilder import YOLOBPPBuilder
+from .BPPBuilder import YOLOBPPTracker
 
-__all__ = ["YOLOBPPBuilder"]
+__all__ = ["YOLOBPPTracker"]
